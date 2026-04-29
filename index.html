@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRE 2.0 Question Library - Advanced Viewer</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-blue: #0056b3;
+            --sidebar-bg: #1a1d21;
+            --content-bg: #fdfdfd;
+            --text-main: #212529;
+            --text-secondary: #495057;
+            --border-color: #e9ecef;
+            --accent-color: #0d6efd;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+            color: var(--text-main);
+            scroll-behavior: smooth;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            color: #fff;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .nav-link {
+            color: #adb5bd;
+            padding: 0.8rem 1.5rem;
+            border-left: 4px solid transparent;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover {
+            color: #fff;
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .nav-link.active {
+            color: #fff;
+            background-color: rgba(13, 110, 253, 0.15);
+            border-left-color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem 4rem;
+            max-width: 1400px;
+        }
+
+        .chapter-title {
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            font-size: 2.2rem;
+            letter-spacing: -0.5px;
+        }
+
+        .section-title {
+            font-weight: 700;
+            color: var(--text-main);
+            background: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            border-left: 5px solid #6c757d;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Question Card */
+        .question-card {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .question-card:hover {
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .card-header-custom {
+            padding: 1.5rem;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .q-number-badge {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-family: 'Roboto Mono', monospace;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .q-text {
+            font-weight: 600;
+            font-size: 1.15rem;
+            line-height: 1.4;
+            color: #1a1d21;
+            margin-right: 20px;
+        }
+
+        .card-body-custom {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            border-top: 1px solid #f1f3f5;
+            background-color: #fafbfc;
+        }
+
+        /* Metadata Grid */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem 0;
+            margin-bottom: 1rem;
+        }
+
+        .meta-item label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #94a3b8;
+            margin-bottom: 0.25rem;
+            letter-spacing: 0.5px;
+        }
+
+        .meta-item span {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* Content Sections */
+        .content-block {
+            margin-top: 1.5rem;
+        }
+
+        .block-title {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .block-title::after {
+            content: "";
+            flex-grow: 1;
+            height: 1px;
+            background: #e2e8f0;
+            margin-left: 1rem;
+        }
+
+        .block-text {
+            color: #334155;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+        }
+
+        /* Vessel Badges Inside */
+        .vessel-badge-container {
+            margin-top: 0.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .badge-vessel {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Collapse Animation */
+        .collapse-icon {
+            transition: transform 0.3s;
+            color: #cbd5e1;
+        }
+
+        .collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar { width: 100%; position: relative; height: auto; }
+            .main-content { margin-left: 0; padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h4 class="mb-0"><i class="bi bi-shield-check me-2"></i>SIRE 2.0</h4>
+                <p class="text-muted small mb-0 mt-1">Question Library v1.0</p>
+            </div>
+            <div class="nav flex-column mt-3" id="nav-list">
+                <!-- Nav items injected here -->
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div id="content-area">
+                <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+                    <div class="text-center">
+                        <div class="spinner-grow text-primary" role="status"></div>
+                        <p class="mt-3 text-muted">Building your library...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    async function loadData() {
+        try {
+            const response = await fetch('https://tejbir1997.github.io/samplerepo/pdf_parser_1.json');
+            const data = await response.json();
+            renderContent(data);
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('content-area').innerHTML = `
+                <div class="alert alert-danger shadow-sm mt-5">
+                    <h5><i class="bi bi-exclamation-triangle-fill me-2"></i>Failed to load JSON</h5>
+                    <p class="mb-0">Please ensure <strong>pdf_parser_1.json</strong> is in the same folder.</p>
+                </div>`;
+        }
+    }
+
+    function renderContent(chapters) {
+        const contentArea = document.getElementById('content-area');
+        const navList = document.getElementById('nav-list');
+        
+        contentArea.innerHTML = '';
+        navList.innerHTML = '';
+
+        chapters.forEach(chapter => {
+            const chapterId = `ch-${chapter.chapter_number}`;
+            
+            // Sidebar Link
+            const navLink = document.createElement('a');
+            navLink.className = 'nav-link';
+            navLink.href = `#${chapterId}`;
+            navLink.innerHTML = `<span class="me-2 opacity-50">Ch ${chapter.chapter_number}</span> ${chapter.chapter_title}`;
+            navList.appendChild(navLink);
+
+            // Chapter Header
+            const chHeader = document.createElement('h1');
+            chHeader.id = chapterId;
+            chHeader.className = 'chapter-title';
+            chHeader.textContent = `Chapter ${chapter.chapter_number}: ${chapter.chapter_title}`;
+            contentArea.appendChild(chHeader);
+
+            chapter.sections.forEach(section => {
+                const sectionId = `sec-${section.section_number.replace(/\./g, '-')}`;
+                
+                // Section Header
+                const secHeader = document.createElement('div');
+                secHeader.id = sectionId;
+                secHeader.className = 'section-title';
+                secHeader.innerHTML = `<i class="bi bi-folder2-open me-2"></i> Section ${section.section_number}: ${section.section_title}`;
+                contentArea.appendChild(secHeader);
+
+                // Questions
+                section.questions.forEach((q, idx) => {
+                    const qId = `q-${q.question_number.replace(/\./g, '-')}`;
+                    const card = document.createElement('div');
+                    card.className = 'question-card';
+                    
+                    const vesselBadges = q.vessel_types ? q.vessel_types.map(v => `<span class="badge-vessel">${v}</span>`).join('') : '';
+
+                    card.innerHTML = `
+                        <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-${qId}">
+                            <div class="d-flex align-items-start">
+                                <span class="q-number-badge">${q.question_number}</span>
+                                <div class="q-text">${q.question_text}</div>
+                            </div>
+                            <i class="bi bi-chevron-down fs-5 collapse-icon"></i>
+                        </div>
+                        <div id="collapse-${qId}" class="collapse">
+                            <div class="card-body-custom">
+                                <div class="meta-grid">
+                                    <div class="meta-item">
+                                        <label>Short Question Text</label>
+                                        <span>${q.short_question_text || 'N/A'}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <label>ROVIQ Sequence</label>
+                                        <span>${q.roviq_sequence || 'N/A'}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <label>Format</label>
+                                        <span class="badge bg-primary opacity-75">${q.question_format}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <label>Vessel Types</label>
+                                        <div class="vessel-badge-container">${vesselBadges || 'None'}</div>
+                                    </div>
+                                </div>
+
+                                ${renderBlock('Objective', q.objective)}
+                                ${renderBlock('Publications', q.publications)}
+                                ${renderBlock('Inspection Guidance', q.inspection_guidance)}
+                                ${renderBlock('Prior to Boarding', q.actions_prior_to_boarding)}
+                                ${renderBlock('During Inspection', q.actions_during_inspection)}
+                                ${renderBlock('Expected Evidence', q.expected_evidence)}
+                                ${renderBlock('Negative Observation Grounds', q.negative_observation_grounds)}
+                                ${q.data_source ? renderBlock('Data Source', q.data_source) : ''}
+                            </div>
+                        </div>
+                    `;
+                    contentArea.appendChild(card);
+                });
+            });
+        });
+
+        // Add scrollspy effect
+        const links = document.querySelectorAll('.nav-link');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            document.querySelectorAll('h1, .section-title').forEach(el => {
+                const top = el.offsetTop;
+                if (pageYOffset >= top - 100) current = el.getAttribute('id');
+            });
+            links.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) link.classList.add('active');
+            });
+        });
+    }
+
+    function renderBlock(title, content) {
+        if (!content || content === 'N/A' || content.trim() === '') return '';
+        return `
+            <div class="content-block">
+                <div class="block-title">${title}</div>
+                <div class="block-text">${content}</div>
+            </div>
+        `;
+    }
+
+    document.addEventListener('DOMContentLoaded', loadData);
+</script>
+
+</body>
+</html>
