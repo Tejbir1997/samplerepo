@@ -1,0 +1,1287 @@
+
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maritime Inspection - Template Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        marine: {
+                            50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc',
+                            400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1',
+                            800: '#075985', 900: '#0c4a6e', 950: '#082f49',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .sidebar-item:hover { background: linear-gradient(90deg, #0c4a6e 0%, #075985 100%); }
+        .template-card { transition: all 0.3s ease; }
+        .template-card:hover { transform: translateY(-4px); box-shadow: 0 10px 40px rgba(12, 74, 110, 0.15); }
+        .status-badge { font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600; }
+        .status-active { background: #dcfce7; color: #166534; }
+        .status-draft { background: #fef9c3; color: #854d0e; }
+        .status-archived { background: #f3f4f6; color: #6b7280; }
+        .version-tag { background: #e0f2fe; color: #0369a1; padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; }
+        .import-dropzone { border: 2px dashed #cbd5e1; transition: all 0.3s; }
+        .import-dropzone:hover, .import-dropzone.dragover { border-color: #0ea5e9; background: #f0f9ff; }
+        .tab-active { border-bottom: 3px solid #0c4a6e; color: #0c4a6e; font-weight: 600; }
+        .tab-inactive { color: #64748b; }
+        .tab-inactive:hover { color: #0c4a6e; }
+        .modal-overlay { backdrop-filter: blur(4px); }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .concentrated-item { border-left: 4px solid #f59e0b; background: #fffbeb; }
+        .favorable-default { color: #059669; font-weight: 600; }
+        .image-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 0.5rem; border: 2px solid #e2e8f0; }
+        .c-item-toggle:checked + div { background: #0c4a6e; }
+        .c-item-toggle:checked + div div { transform: translateX(1rem); }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+<!-- Top Navigation -->
+<nav class="bg-marine-950 text-white h-16 flex items-center justify-between px-6 shadow-lg sticky top-0 z-50">
+    <div class="flex items-center gap-4">
+        <div class="w-10 h-10 bg-marine-700 rounded-lg flex items-center justify-center"><i class="fas fa-ship text-xl"></i></div>
+        <div>
+            <h1 class="font-bold text-lg leading-tight">Maritime Inspection</h1>
+            <p class="text-xs text-marine-300">Template Library & Question Management</p>
+        </div>
+    </div>
+    <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 bg-marine-900 px-3 py-1.5 rounded-lg">
+            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span><span class="text-sm">Office View</span>
+        </div>
+        <button class="relative p-2 hover:bg-marine-800 rounded-lg transition"><i class="fas fa-bell"></i><span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span></button>
+        <div class="flex items-center gap-2 bg-marine-900 px-3 py-1.5 rounded-lg cursor-pointer">
+            <div class="w-8 h-8 bg-marine-600 rounded-full flex items-center justify-center"><i class="fas fa-user text-sm"></i></div>
+            <span class="text-sm">Chief Inspector</span><i class="fas fa-chevron-down text-xs"></i>
+        </div>
+    </div>
+</nav>
+
+<div class="flex h-[calc(100vh-64px)]">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-marine-900 text-white flex flex-col shadow-xl">
+        <div class="p-4">
+            <div class="text-xs font-semibold text-marine-400 uppercase tracking-wider mb-3">Main Menu</div>
+            <nav class="space-y-1">
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg transition"><i class="fas fa-home w-5"></i><span>Dashboard</span></a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg bg-marine-800 transition"><i class="fas fa-book w-5"></i><span class="font-semibold">Template Library</span><span class="ml-auto bg-marine-600 text-xs px-2 py-0.5 rounded-full">Active</span></a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg transition"><i class="fas fa-clipboard-list w-5"></i><span>Inspections</span></a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg transition"><i class="fas fa-ship w-5"></i><span>Vessel List</span></a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg transition"><i class="fas fa-chart-bar w-5"></i><span>Reports</span></a>
+            </nav>
+        </div>
+        <div class="mt-auto p-4 border-t border-marine-800">
+            <div class="text-xs font-semibold text-marine-400 uppercase tracking-wider mb-3">System</div>
+            <nav class="space-y-1">
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg transition"><i class="fas fa-history w-5"></i><span>Audit Log</span></a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg transition"><i class="fas fa-cog w-5"></i><span>Settings</span></a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-auto p-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900">Template Library</h2>
+                <p class="text-slate-500 mt-1">Manage inspection templates, questions, and import third-party reports</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="openImportModal()" class="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition shadow-sm text-slate-700 font-medium">
+                    <i class="fas fa-file-import text-marine-600"></i>Import Report
+                </button>
+                <button onclick="openCreateModal()" class="flex items-center gap-2 px-4 py-2.5 bg-marine-700 text-white rounded-lg hover:bg-marine-800 transition shadow-md font-medium">
+                    <i class="fas fa-plus"></i>New Template
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between">
+                    <div><p class="text-sm text-slate-500">Total Templates</p><p class="text-2xl font-bold text-slate-900">24</p></div>
+                    <div class="w-12 h-12 bg-marine-100 rounded-lg flex items-center justify-center"><i class="fas fa-book text-marine-600 text-xl"></i></div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between">
+                    <div><p class="text-sm text-slate-500">Active</p><p class="text-2xl font-bold text-green-600">18</p></div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center"><i class="fas fa-check-circle text-green-600 text-xl"></i></div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between">
+                    <div><p class="text-sm text-slate-500">Drafts</p><p class="text-2xl font-bold text-amber-600">4</p></div>
+                    <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center"><i class="fas fa-edit text-amber-600 text-xl"></i></div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between">
+                    <div><p class="text-sm text-slate-500">Imported (SIRE)</p><p class="text-2xl font-bold text-marine-600">6</p></div>
+                    <div class="w-12 h-12 bg-marine-100 rounded-lg flex items-center justify-center"><i class="fas fa-file-upload text-marine-600 text-xl"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
+            <div class="flex items-center gap-4 flex-wrap">
+                <div class="flex-1 min-w-[300px]">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" placeholder="Search templates by name, type, or vessel class..." 
+                            class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500 focus:border-transparent">
+                    </div>
+                </div>
+                <select class="px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500 bg-white">
+                    <option>All Types</option><option>Vessel Inspection (VI)</option><option>Docking</option><option>Takeover</option><option>Layup</option><option>Internal</option>
+                </select>
+                <select class="px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500 bg-white">
+                    <option>All Status</option><option>Active</option><option>Draft</option><option>Archived</option>
+                </select>
+                <select class="px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500 bg-white">
+                    <option>All Versions</option><option>Latest Only</option><option>Has Updates</option>
+                </select>
+                <button class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-lg transition text-slate-600"><i class="fas fa-filter"></i></button>
+            </div>
+        </div>
+
+        <!-- Templates Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+            
+            <!-- Card 1: Active SIRE -->
+            <div class="template-card bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-5">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-marine-100 rounded-lg flex items-center justify-center"><i class="fas fa-file-alt text-marine-600 text-xl"></i></div>
+                            <div>
+                                <h3 class="font-bold text-slate-900">SIRE Vessel Inspection</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="version-tag">v2.1</span><span class="status-badge status-active">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <button onclick="toggleMenu(this)" class="p-2 hover:bg-slate-100 rounded-lg transition"><i class="fas fa-ellipsis-v text-slate-400"></i></button>
+                            <div class="hidden absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 z-10 py-1">
+                                <a href="#" onclick="openEditModal('SIRE Vessel Inspection')" class="block px-4 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-edit mr-2 text-slate-400"></i>Edit</a>
+                                <a href="#" onclick="openCloneModal('SIRE Vessel Inspection')" class="block px-4 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-copy mr-2 text-slate-400"></i>Clone to New Version</a>
+                                <a href="#" class="block px-4 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-eye mr-2 text-slate-400"></i>Preview</a>
+                                <div class="border-t border-slate-200 my-1"></div>
+                                <a href="#" class="block px-4 py-2 hover:bg-slate-50 text-sm text-red-600"><i class="fas fa-archive mr-2"></i>Archive</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-ship w-4 text-slate-400"></i><span>Type: Vessel Inspection (VI)</span></div>
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-list w-4 text-slate-400"></i><span>156 Questions - 12 Sections</span></div>
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-calendar w-4 text-slate-400"></i><span>Updated: 15 May 2026</span></div>
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-user w-4 text-slate-400"></i><span>By: Chief Inspector</span></div>
+                    </div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2 py-1 bg-slate-100 rounded text-xs text-slate-600">Imported</span>
+                        <span class="px-2 py-1 bg-slate-100 rounded text-xs text-slate-600">SIRE Format</span>
+                        <span class="px-2 py-1 bg-amber-100 rounded text-xs text-amber-700 font-medium">C-Items: 8</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openEditModal('SIRE Vessel Inspection')" class="flex-1 py-2 bg-marine-50 text-marine-700 rounded-lg hover:bg-marine-100 transition text-sm font-medium border border-marine-200"><i class="fas fa-edit mr-1"></i> Edit</button>
+                        <button onclick="openCloneModal('SIRE Vessel Inspection')" class="flex-1 py-2 bg-slate-50 text-slate-700 rounded-lg hover:bg-slate-100 transition text-sm font-medium border border-slate-200"><i class="fas fa-copy mr-1"></i> Clone</button>
+                    </div>
+                </div>
+                <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                    <span class="text-xs text-slate-500">Bound to 3 active inspections</span>
+                    <span class="text-xs font-semibold text-red-600"><i class="fas fa-lock mr-1"></i>Immutable</span>
+                </div>
+            </div>
+
+            <!-- Card 2: Draft -->
+            <div class="template-card bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-5">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center"><i class="fas fa-file-alt text-amber-600 text-xl"></i></div>
+                            <div>
+                                <h3 class="font-bold text-slate-900">Docking Inspection - Tankers</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="version-tag">v1.0</span><span class="status-badge status-draft">Draft</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <button onclick="toggleMenu(this)" class="p-2 hover:bg-slate-100 rounded-lg transition"><i class="fas fa-ellipsis-v text-slate-400"></i></button>
+                            <div class="hidden absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 z-10 py-1">
+                                <a href="#" onclick="openEditModal('Docking Inspection - Tankers')" class="block px-4 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-edit mr-2 text-slate-400"></i>Edit</a>
+                                <a href="#" onclick="openCloneModal('Docking Inspection - Tankers')" class="block px-4 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-copy mr-2 text-slate-400"></i>Clone to New Version</a>
+                                <a href="#" class="block px-4 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-eye mr-2 text-slate-400"></i>Preview</a>
+                                <div class="border-t border-slate-200 my-1"></div>
+                                <a href="#" class="block px-4 py-2 hover:bg-slate-50 text-sm text-green-600"><i class="fas fa-check-circle mr-2"></i>Activate</a>
+                                <a href="#" class="block px-4 py-2 hover:bg-slate-50 text-sm text-red-600"><i class="fas fa-trash mr-2"></i>Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-ship w-4 text-slate-400"></i><span>Type: Docking</span></div>
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-list w-4 text-slate-400"></i><span>89 Questions - 8 Sections</span></div>
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-calendar w-4 text-slate-400"></i><span>Created: 20 May 2026</span></div>
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-user w-4 text-slate-400"></i><span>By: Inspector Smith</span></div>
+                    </div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2 py-1 bg-slate-100 rounded text-xs text-slate-600">Manual</span>
+                        <span class="px-2 py-1 bg-amber-100 rounded text-xs text-amber-700 font-medium">C-Items: 3</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openEditModal('Docking Inspection - Tankers')" class="flex-1 py-2 bg-marine-50 text-marine-700 rounded-lg hover:bg-marine-100 transition text-sm font-medium border border-marine-200"><i class="fas fa-edit mr-1"></i> Edit</button>
+                        <button class="flex-1 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition text-sm font-medium border border-green-200"><i class="fas fa-check mr-1"></i> Activate</button>
+                    </div>
+                </div>
+                <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                    <span class="text-xs text-slate-500">Not bound to any inspection</span>
+                    <span class="text-xs font-semibold text-green-600"><i class="fas fa-unlock mr-1"></i>Editable</span>
+                </div>
+            </div>
+
+            <!-- Card 3: Active with Certificate Section -->
+            <div class="template-card bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-5">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-marine-100 rounded-lg flex items-center justify-center"><i class="fas fa-file-alt text-marine-600 text-xl"></i></div>
+                            <div>
+                                <h3 class="font-bold text-slate-900">Takeover Inspection</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="version-tag">v3.0</span><span class="status-badge status-active">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <button onclick="toggleMenu(this)" class="p-2 hover:bg-slate-100 rounded-lg transition"><i class="fas fa-ellipsis-v text-slate-400"></i></button>
+                            <div class="hidden absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 z-10 py-1">
+                                <a href="#" onclick="openEditModal('Takeover Inspection')" class="block px-4 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-edit mr-2 text-slate-400"></i>Edit</a>
+                                <a href="#" onclick="openCloneModal('Takeover Inspection')" class="block px-4 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-copy mr-2 text-slate-400"></i>Clone to New Version</a>
+                                <a href="#" class="block px-4 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-eye mr-2 text-slate-400"></i>Preview</a>
+                                <div class="border-t border-slate-200 my-1"></div>
+                                <a href="#" class="block px-4 py-2 hover:bg-slate-50 text-sm text-red-600"><i class="fas fa-archive mr-2"></i>Archive</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-ship w-4 text-slate-400"></i><span>Type: Takeover</span></div>
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-list w-4 text-slate-400"></i><span>203 Questions - 15 Sections</span></div>
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-calendar w-4 text-slate-400"></i><span>Updated: 10 May 2026</span></div>
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-certificate w-4 text-slate-400"></i><span class="text-marine-600 font-medium">Certificate Section: ON</span></div>
+                    </div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2 py-1 bg-slate-100 rounded text-xs text-slate-600">Manual</span>
+                        <span class="px-2 py-1 bg-marine-100 rounded text-xs text-marine-700 font-medium">Favorable Default</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openEditModal('Takeover Inspection')" class="flex-1 py-2 bg-marine-50 text-marine-700 rounded-lg hover:bg-marine-100 transition text-sm font-medium border border-marine-200"><i class="fas fa-edit mr-1"></i> Edit</button>
+                        <button onclick="openCloneModal('Takeover Inspection')" class="flex-1 py-2 bg-slate-50 text-slate-700 rounded-lg hover:bg-slate-100 transition text-sm font-medium border border-slate-200"><i class="fas fa-copy mr-1"></i> Clone</button>
+                    </div>
+                </div>
+                <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                    <span class="text-xs text-slate-500">Bound to 1 active inspection</span>
+                    <span class="text-xs font-semibold text-red-600"><i class="fas fa-lock mr-1"></i>Immutable</span>
+                </div>
+            </div>
+
+            <!-- Card 4: Imported - Needs Review -->
+            <div class="template-card bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-5">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center"><i class="fas fa-file-import text-purple-600 text-xl"></i></div>
+                            <div>
+                                <h3 class="font-bold text-slate-900">SIRE Layup Inspection</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="version-tag">v1.0 (Imported)</span><span class="status-badge status-draft">Needs Review</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <button onclick="toggleMenu(this)" class="p-2 hover:bg-slate-100 rounded-lg transition"><i class="fas fa-ellipsis-v text-slate-400"></i></button>
+                            <div class="hidden absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 z-10 py-1">
+                                <a href="#" onclick="openEditModal('SIRE Layup Inspection')" class="block px-4 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-edit mr-2 text-slate-400"></i>Review & Edit</a>
+                                <a href="#" class="block px-4 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-check-circle mr-2 text-slate-400"></i>Activate</a>
+                                <a href="#" class="block px-4 py-2 hover:bg-slate-50 text-sm text-red-600"><i class="fas fa-trash mr-2"></i>Discard</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-ship w-4 text-slate-400"></i><span>Type: Layup</span></div>
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-list w-4 text-slate-400"></i><span>67 Questions - 6 Sections</span></div>
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-calendar w-4 text-slate-400"></i><span>Imported: 22 May 2026</span></div>
+                        <div class="flex items-center gap-2 text-sm text-slate-600"><i class="fas fa-exclamation-triangle w-4 text-amber-500"></i><span class="text-amber-600">3 parsing warnings</span></div>
+                    </div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2 py-1 bg-purple-100 rounded text-xs text-purple-700">SIRE Import</span>
+                        <span class="px-2 py-1 bg-amber-100 rounded text-xs text-amber-700">Review Required</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openEditModal('SIRE Layup Inspection')" class="flex-1 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition text-sm font-medium border border-purple-200"><i class="fas fa-search mr-1"></i> Review</button>
+                        <button class="flex-1 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition text-sm font-medium border border-green-200"><i class="fas fa-check mr-1"></i> Activate</button>
+                    </div>
+                </div>
+                <div class="px-5 py-3 bg-amber-50 border-t border-amber-200">
+                    <span class="text-xs text-amber-800"><i class="fas fa-info-circle mr-1"></i>Imported from SIRE Report #SIRE-2026-0442. Please review and correct before activation.</span>
+                </div>
+            </div>
+
+            <!-- Card 5: Archived -->
+            <div class="template-card bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden opacity-75">
+                <div class="p-5">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center"><i class="fas fa-file-alt text-slate-400 text-xl"></i></div>
+                            <div>
+                                <h3 class="font-bold text-slate-500">Internal Audit - General</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="px-2 py-0.5 bg-slate-200 text-slate-600 rounded text-xs font-semibold">v1.3</span><span class="status-badge status-archived">Archived</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <button onclick="toggleMenu(this)" class="p-2 hover:bg-slate-100 rounded-lg transition"><i class="fas fa-ellipsis-v text-slate-400"></i></button>
+                            <div class="hidden absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 z-10 py-1">
+                                <a href="#" onclick="openCloneModal('Internal Audit - General')" class="block px-4 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-copy mr-2 text-slate-400"></i>Clone to New Version</a>
+                                <a href="#" class="block px-4 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-eye mr-2 text-slate-400"></i>View Only</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2 text-sm text-slate-500"><i class="fas fa-ship w-4 text-slate-400"></i><span>Type: Internal</span></div>
+                        <div class="flex items-center gap-2 text-sm text-slate-500"><i class="fas fa-list w-4 text-slate-400"></i><span>45 Questions - 5 Sections</span></div>
+                        <div class="flex items-center gap-2 text-sm text-slate-500"><i class="fas fa-calendar w-4 text-slate-400"></i><span>Archived: 01 Apr 2026</span></div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openCloneModal('Internal Audit - General')" class="flex-1 py-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition text-sm font-medium border border-slate-300"><i class="fas fa-copy mr-1"></i> Clone to New</button>
+                    </div>
+                </div>
+                <div class="px-5 py-3 bg-slate-50 border-t border-slate-200">
+                    <span class="text-xs text-slate-500">Superseded by v2.0. Read-only access.</span>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Import Report Modal (Task 2.1) -->
+<div id="importModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay bg-black/50">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 animate-fade-in max-h-[90vh] overflow-auto">
+        <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center"><i class="fas fa-file-import text-purple-600"></i></div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Import Third-Party Report</h3>
+                    <p class="text-sm text-slate-500">Task 2.1: Convert SIRE/raw text to standardized template</p>
+                </div>
+            </div>
+            <button onclick="closeModal('importModal')" class="p-2 hover:bg-slate-100 rounded-lg transition"><i class="fas fa-times text-slate-400"></i></button>
+        </div>
+        <div class="p-6 space-y-6">
+            <!-- Step 1 -->
+            <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-8 h-8 bg-marine-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
+                    <h4 class="font-semibold text-slate-900">Upload Raw Report</h4>
+                </div>
+                <div class="import-dropzone rounded-xl p-8 text-center cursor-pointer" onclick="document.getElementById('fileInput').click()">
+                    <input type="file" id="fileInput" class="hidden" accept=".txt,.pdf,.doc,.docx" onchange="handleFileSelect(this)">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-slate-300 mb-3"></i>
+                    <p class="text-slate-600 font-medium">Click to upload or drag & drop</p>
+                    <p class="text-sm text-slate-400 mt-1">Supports: SIRE reports, raw text, PDF, Word</p>
+                </div>
+                <div id="filePreview" class="hidden mt-4 p-4 bg-white rounded-lg border border-slate-200 flex items-center gap-3">
+                    <i class="fas fa-file-alt text-purple-600 text-2xl"></i>
+                    <div class="flex-1">
+                        <p class="font-medium text-slate-900">SIRE_Report_2026_0442.txt</p>
+                        <p class="text-sm text-slate-500">2.4 MB - 1,247 lines detected</p>
+                    </div>
+                    <button class="text-red-500 hover:text-red-700" onclick="clearFile()"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <!-- Step 2 -->
+            <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-8 h-8 bg-marine-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
+                    <h4 class="font-semibold text-slate-900">Parser Configuration</h4>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Report Format</label>
+                        <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500">
+                            <option>SIRE (Ship Inspection Report Programme)</option>
+                            <option>CDI (Chemical Distribution Institute)</option>
+                            <option>Custom Format</option>
+                            <option>Raw Text (Auto-detect)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Inspection Type</label>
+                        <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500">
+                            <option>Vessel Inspection (VI)</option>
+                            <option>Docking</option>
+                            <option>Takeover</option>
+                            <option>Layup</option>
+                            <option>Internal</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Vessel Type</label>
+                        <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500">
+                            <option>Oil Tanker</option>
+                            <option>Chemical Tanker</option>
+                            <option>Gas Carrier</option>
+                            <option>Bulk Carrier</option>
+                            <option>Container Ship</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Version Start</label>
+                        <input type="text" value="v1.0" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500">
+                    </div>
+                </div>
+            </div>
+            <!-- Step 3 -->
+            <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-8 h-8 bg-marine-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
+                    <h4 class="font-semibold text-slate-900">Review & Activate</h4>
+                </div>
+                <div class="bg-white rounded-lg border border-slate-200 p-4 mb-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-medium text-slate-700">Parser Preview:</span>
+                        <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded"><i class="fas fa-check mr-1"></i>Ready to parse</span>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between py-1 border-b border-slate-100"><span class="text-slate-500">Questions Detected:</span><span class="font-semibold text-slate-900">156 items</span></div>
+                        <div class="flex justify-between py-1 border-b border-slate-100"><span class="text-slate-500">Sections Grouped:</span><span class="font-semibold text-slate-900">12 sections</span></div>
+                        <div class="flex justify-between py-1 border-b border-slate-100"><span class="text-slate-500">Concentrated Items:</span><span class="font-semibold text-amber-600">8 items detected</span></div>
+                        <div class="flex justify-between py-1"><span class="text-slate-500">Warnings:</span><span class="font-semibold text-amber-600">3 items need review</span></div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 mb-4">
+                    <input type="checkbox" id="autoActivate" class="w-4 h-4 text-marine-600 rounded focus:ring-marine-500">
+                    <label for="autoActivate" class="text-sm text-slate-700">Auto-activate after review (requires manual confirmation)</label>
+                </div>
+            </div>
+        </div>
+        <div class="sticky bottom-0 bg-white border-t border-slate-200 px-6 py-4 flex justify-end gap-3 rounded-b-2xl">
+            <button onclick="closeModal('importModal')" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition">Cancel</button>
+            <button onclick="parseReport()" class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium"><i class="fas fa-cogs mr-2"></i>Parse & Review</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Template Modal (Tasks 2.2, 2.3, 2.4) -->
+<div id="editModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay bg-black/50">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl mx-4 animate-fade-in max-h-[95vh] overflow-auto">
+        <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-marine-100 rounded-lg flex items-center justify-center"><i class="fas fa-edit text-marine-600"></i></div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900" id="editModalTitle">Edit Template</h3>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="version-tag">v2.1</span>
+                        <span class="status-badge status-active">Active</span>
+                        <span class="text-xs text-slate-500">Tasks 2.2, 2.3, 2.4</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="saveDraft()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition text-sm font-medium"><i class="fas fa-save mr-1"></i> Save Draft</button>
+                <button onclick="closeModal('editModal')" class="p-2 hover:bg-slate-100 rounded-lg transition"><i class="fas fa-times text-slate-400"></i></button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="sticky top-[73px] bg-white border-b border-slate-200 px-6 z-10">
+            <div class="flex gap-6">
+                <button onclick="switchTab('details')" id="tab-details" class="tab-active py-4 text-sm font-medium transition">Template Details</button>
+                <button onclick="switchTab('questions')" id="tab-questions" class="tab-inactive py-4 text-sm font-medium transition">Question Bank <span class="ml-1 bg-marine-100 text-marine-700 px-1.5 py-0.5 rounded text-xs">156</span></button>
+                <button onclick="switchTab('settings')" id="tab-settings" class="tab-inactive py-4 text-sm font-medium transition">Settings & Logic</button>
+                <button onclick="switchTab('versions')" id="tab-versions" class="tab-inactive py-4 text-sm font-medium transition">Version History</button>
+            </div>
+        </div>
+
+        <div class="p-6">
+            <!-- Tab: Template Details -->
+            <div id="content-details" class="space-y-6">
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Template Name</label>
+                        <input type="text" value="SIRE Vessel Inspection" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Inspection Type</label>
+                        <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500">
+                            <option selected>Vessel Inspection (VI)</option>
+                            <option>Docking</option>
+                            <option>Takeover</option>
+                            <option>Layup</option>
+                            <option>Internal</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Vessel Type Applicability</label>
+                        <select multiple class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500 h-24">
+                            <option selected>Oil Tanker</option>
+                            <option selected>Chemical Tanker</option>
+                            <option>Gas Carrier</option>
+                            <option>Bulk Carrier</option>
+                            <option>Container Ship</option>
+                        </select>
+                        <p class="text-xs text-slate-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Mode</label>
+                        <div class="flex gap-4 mt-2">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked class="w-4 h-4 text-marine-600 rounded"><span class="text-sm">Sailing</span></label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked class="w-4 h-4 text-marine-600 rounded"><span class="text-sm">Port</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+                    <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
+                    <div>
+                        <p class="text-sm font-medium text-amber-800">Template Immutability Rule (Task 2.2)</p>
+                        <p class="text-sm text-amber-700 mt-1">This template is currently <strong>bound to 3 active inspections</strong>. To make changes, you must create a new version (v2.2) via Clone. The current version will remain immutable.</p>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="openCloneModalFromEdit()" class="px-4 py-2 bg-marine-50 text-marine-700 rounded-lg hover:bg-marine-100 transition font-medium border border-marine-200"><i class="fas fa-copy mr-2"></i>Clone to New Version (v2.2)</button>
+                </div>
+            </div>
+
+            <!-- Tab: Question Bank (Task 2.3) -->
+            <div id="content-questions" class="hidden space-y-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <button onclick="openAddQuestionModal()" class="px-4 py-2 bg-marine-700 text-white rounded-lg hover:bg-marine-800 transition text-sm font-medium"><i class="fas fa-plus mr-1"></i> Add Question</button>
+                        <button onclick="openCopyQuestionsModal()" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition text-sm font-medium"><i class="fas fa-copy mr-1"></i> Copy from Template</button>
+                        <button class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition text-sm font-medium"><i class="fas fa-layer-group mr-1"></i> Manage Sections</button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" placeholder="Search questions..." class="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-marine-500">
+                        <select class="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-marine-500">
+                            <option>All Sections</option>
+                            <option>1. General</option>
+                            <option>2. Certificates & Documentation</option>
+                            <option>3. Crew Management</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Section 1 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden">
+                    <div class="section-header px-4 py-3 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <button onclick="toggleSection(this)" class="w-6 h-6 flex items-center justify-center hover:bg-slate-300 rounded transition"><i class="fas fa-chevron-down text-slate-500"></i></button>
+                            <span class="font-semibold text-slate-800">Section 1: General Information & Vessel Particulars</span>
+                            <span class="text-xs text-slate-500">(12 questions)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="p-1.5 hover:bg-slate-300 rounded transition" title="Edit Section"><i class="fas fa-edit text-slate-500 text-sm"></i></button>
+                            <button class="p-1.5 hover:bg-slate-300 rounded transition" title="Add Question to Section"><i class="fas fa-plus text-slate-500 text-sm"></i></button>
+                            <button class="p-1.5 hover:bg-red-100 rounded transition" title="Delete Section"><i class="fas fa-trash text-red-500 text-sm"></i></button>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <!-- Question 1.1 -->
+                        <div class="question-row px-4 py-3 border-t border-slate-100 flex items-start gap-4">
+                            <div class="mt-1 text-xs font-mono text-slate-400 w-12">1.1</div>
+                            <div class="flex-1">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p class="font-medium text-slate-900">Is the vessel's name clearly marked on both sides of the bow and stern?</p>
+                                        <div class="flex items-center gap-3 mt-2">
+                                            <span class="text-xs text-slate-500">Type: Visual Inspection</span>
+                                            <span class="text-xs favorable-default"><i class="fas fa-check-circle mr-1"></i>Favorable: Yes</span>
+                                            <span class="text-xs text-slate-500">Response: Tested/Inspected/Not Cited/NA</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2 ml-4">
+                                        <label class="flex items-center gap-1.5 cursor-pointer" title="Concentrated Item (Task 2.4)">
+                                            <input type="checkbox" class="c-item-toggle sr-only" onchange="toggleConcentrated(this)">
+                                            <div class="w-8 h-5 bg-slate-300 rounded-full relative transition-colors"><div class="w-3 h-3 bg-white rounded-full absolute top-1 left-1 transition-transform"></div></div>
+                                            <span class="text-xs text-slate-500">C-Item</span>
+                                        </label>
+                                        <button class="p-1.5 hover:bg-slate-200 rounded transition" title="Upload Reference Image"><i class="fas fa-image text-slate-400"></i></button>
+                                        <button class="p-1.5 hover:bg-slate-200 rounded transition" title="Edit"><i class="fas fa-edit text-slate-400"></i></button>
+                                        <button class="p-1.5 hover:bg-red-100 rounded transition" title="Delete"><i class="fas fa-trash text-red-400"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Question 1.2 - Concentrated -->
+                        <div class="question-row concentrated-item px-4 py-3 border-t border-slate-100 flex items-start gap-4">
+                            <div class="mt-1 text-xs font-mono text-slate-400 w-12">1.2</div>
+                            <div class="flex-1">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p class="font-medium text-slate-900">Are emergency steering procedures posted in the steering gear compartment?</p>
+                                        <div class="flex items-center gap-3 mt-2">
+                                            <span class="text-xs text-slate-500">Type: Document Check</span>
+                                            <span class="text-xs favorable-default"><i class="fas fa-check-circle mr-1"></i>Favorable: Yes</span>
+                                            <span class="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded"><i class="fas fa-star mr-1"></i>Concentrated Item</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 mt-2">
+                                            <img src="https://via.placeholder.com/80x80/e2e8f0/64748b?text=Ref+Image" class="image-preview" alt="Reference">
+                                            <img src="https://via.placeholder.com/80x80/e2e8f0/64748b?text=Diagram" class="image-preview" alt="Diagram">
+                                            <button class="w-20 h-20 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center text-slate-400 hover:border-marine-500 hover:text-marine-500 transition"><i class="fas fa-plus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2 ml-4">
+                                        <label class="flex items-center gap-1.5 cursor-pointer" title="Concentrated Item (Task 2.4)">
+                                            <input type="checkbox" checked class="c-item-toggle sr-only" onchange="toggleConcentrated(this)">
+                                            <div class="w-8 h-5 bg-marine-600 rounded-full relative transition-colors"><div class="w-3 h-3 bg-white rounded-full absolute top-1 left-1 transition-transform translate-x-3"></div></div>
+                                            <span class="text-xs font-semibold text-marine-700">C-Item</span>
+                                        </label>
+                                        <button class="p-1.5 hover:bg-slate-200 rounded transition" title="Upload Reference Image"><i class="fas fa-image text-marine-600"></i></button>
+                                        <button class="p-1.5 hover:bg-slate-200 rounded transition" title="Edit"><i class="fas fa-edit text-slate-400"></i></button>
+                                        <button class="p-1.5 hover:bg-red-100 rounded transition" title="Delete"><i class="fas fa-trash text-red-400"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Question 1.3 -->
+                        <div class="question-row px-4 py-3 border-t border-slate-100 flex items-start gap-4">
+                            <div class="mt-1 text-xs font-mono text-slate-400 w-12">1.3</div>
+                            <div class="flex-1">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p class="font-medium text-slate-900">Is the vessel's load line certificate valid and onboard?</p>
+                                        <div class="flex items-center gap-3 mt-2">
+                                            <span class="text-xs text-slate-500">Type: Certificate Check</span>
+                                            <span class="text-xs favorable-default"><i class="fas fa-check-circle mr-1"></i>Favorable: Valid</span>
+                                            <span class="text-xs text-slate-500">Response: Tested/Inspected/Not Cited/NA</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2 ml-4">
+                                        <label class="flex items-center gap-1.5 cursor-pointer" title="Concentrated Item (Task 2.4)">
+                                            <input type="checkbox" class="c-item-toggle sr-only" onchange="toggleConcentrated(this)">
+                                            <div class="w-8 h-5 bg-slate-300 rounded-full relative transition-colors"><div class="w-3 h-3 bg-white rounded-full absolute top-1 left-1 transition-transform"></div></div>
+                                            <span class="text-xs text-slate-500">C-Item</span>
+                                        </label>
+                                        <button class="p-1.5 hover:bg-slate-200 rounded transition" title="Upload Reference Image"><i class="fas fa-image text-slate-400"></i></button>
+                                        <button class="p-1.5 hover:bg-slate-200 rounded transition" title="Edit"><i class="fas fa-edit text-slate-400"></i></button>
+                                        <button class="p-1.5 hover:bg-red-100 rounded transition" title="Delete"><i class="fas fa-trash text-red-400"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Section 2 -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden">
+                    <div class="section-header px-4 py-3 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <button onclick="toggleSection(this)" class="w-6 h-6 flex items-center justify-center hover:bg-slate-300 rounded transition"><i class="fas fa-chevron-down text-slate-500"></i></button>
+                            <span class="font-semibold text-slate-800">Section 2: Certificates & Documentation</span>
+                            <span class="text-xs text-slate-500">(18 questions)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="p-1.5 hover:bg-slate-300 rounded transition"><i class="fas fa-edit text-slate-500 text-sm"></i></button>
+                            <button class="p-1.5 hover:bg-slate-300 rounded transition"><i class="fas fa-plus text-slate-500 text-sm"></i></button>
+                            <button class="p-1.5 hover:bg-red-100 rounded transition"><i class="fas fa-trash text-red-500 text-sm"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Settings & Logic (Task 2.4) -->
+            <div id="content-settings" class="hidden space-y-6">
+                <div class="grid grid-cols-2 gap-6">
+                    <!-- Concentrated Items Toggle -->
+                    <div class="bg-white border border-slate-200 rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center"><i class="fas fa-star text-amber-600"></i></div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-900">Concentrated (C) Items</h4>
+                                    <p class="text-sm text-slate-500">Task 2.4: Highlight post-state inspection items</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer" onchange="toggleSetting(this, 'c-items')">
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:ring-4 peer-focus:ring-marine-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-marine-600"></div>
+                            </label>
+                        </div>
+                        <p class="text-sm text-slate-600">When enabled, questions marked as "Concentrated Items" will be highlighted in <span class="font-semibold text-amber-600">amber color</span> during inspection execution. These are critical post-state inspection items requiring special attention.</p>
+                        <div class="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                            <p class="text-sm text-amber-800"><i class="fas fa-info-circle mr-1"></i> 8 questions currently marked as C-Items in this template</p>
+                        </div>
+                    </div>
+
+                    <!-- Favorable Answers Default -->
+                    <div class="bg-white border border-slate-200 rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center"><i class="fas fa-check-circle text-green-600"></i></div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-900">Favorable Answer Defaults</h4>
+                                    <p class="text-sm text-slate-500">Task 2.4: Auto-select favorable responses</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer" onchange="toggleSetting(this, 'favorable')">
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:ring-4 peer-focus:ring-marine-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-marine-600"></div>
+                            </label>
+                        </div>
+                        <p class="text-sm text-slate-600">When enabled, all questions will have their <span class="font-semibold text-green-600">favorable answer</span> pre-selected by default during inspection execution. Inspectors can change this if the actual condition differs.</p>
+                        <div class="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+                            <p class="text-sm text-green-800"><i class="fas fa-check mr-1"></i> All 156 questions have favorable defaults configured</p>
+                        </div>
+                    </div>
+
+                    <!-- Certificate Section Toggle -->
+                    <div class="bg-white border border-slate-200 rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-marine-100 rounded-lg flex items-center justify-center"><i class="fas fa-certificate text-marine-600"></i></div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-900">Certificate Section</h4>
+                                    <p class="text-sm text-slate-500">Task 2.4: Show/Hide certificate validation</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" onchange="toggleSetting(this, 'certificate')">
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:ring-4 peer-focus:ring-marine-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-marine-600"></div>
+                            </label>
+                        </div>
+                        <p class="text-sm text-slate-600">When enabled, a dedicated <span class="font-semibold text-marine-600">Certificates tab</span> will appear in the inspection form. This allows inspectors to validate vessel certificates (Load Line, Safety Radio, Safety Equipment, etc.) during the audit.</p>
+                        <div class="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <p class="text-sm text-slate-600"><i class="fas fa-eye-slash mr-1"></i> Currently hidden for this template type</p>
+                        </div>
+                    </div>
+
+                    <!-- Response Types -->
+                    <div class="bg-white border border-slate-200 rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center"><i class="fas fa-list-check text-purple-600"></i></div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-900">Response Types</h4>
+                                    <p class="text-sm text-slate-500">Available answer options for inspectors</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition">
+                                <input type="checkbox" checked class="w-4 h-4 text-marine-600 rounded"><span class="text-sm font-medium">Tested</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition">
+                                <input type="checkbox" checked class="w-4 h-4 text-marine-600 rounded"><span class="text-sm font-medium">Inspected</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition">
+                                <input type="checkbox" checked class="w-4 h-4 text-marine-600 rounded"><span class="text-sm font-medium">Not Cited</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition">
+                                <input type="checkbox" checked class="w-4 h-4 text-marine-600 rounded"><span class="text-sm font-medium">Not Applicable (NA)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Version History (Task 2.2) -->
+            <div id="content-versions" class="hidden space-y-6">
+                <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-200">
+                        <h4 class="font-semibold text-slate-900">Version History & Audit Trail</h4>
+                        <p class="text-sm text-slate-500">Task 2.2: Template Schema & Versioning with strict immutability</p>
+                    </div>
+                    <div class="divide-y divide-slate-200">
+                        <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center"><i class="fas fa-check text-green-600"></i></div>
+                                <div>
+                                    <p class="font-medium text-slate-900">v2.1 <span class="status-badge status-active ml-2">Current Active</span></p>
+                                    <p class="text-sm text-slate-500">Updated by Chief Inspector on 15 May 2026 at 14:30</p>
+                                    <p class="text-xs text-slate-400 mt-1">Changes: Added 3 new C-Items, updated Section 4 questions</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-slate-500">Bound to 3 inspections</span>
+                                <span class="text-xs font-semibold text-red-600"><i class="fas fa-lock mr-1"></i>Immutable</span>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center"><i class="fas fa-archive text-slate-500"></i></div>
+                                <div>
+                                    <p class="font-medium text-slate-900">v2.0 <span class="status-badge status-archived ml-2">Archived</span></p>
+                                    <p class="text-sm text-slate-500">Updated by Chief Inspector on 01 Apr 2026 at 09:15</p>
+                                    <p class="text-xs text-slate-400 mt-1">Superseded by v2.1</p>
+                                </div>
+                            </div>
+                            <button class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition text-sm"><i class="fas fa-eye mr-1"></i> View Only</button>
+                        </div>
+                        <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center"><i class="fas fa-archive text-slate-500"></i></div>
+                                <div>
+                                    <p class="font-medium text-slate-900">v1.5 <span class="status-badge status-archived ml-2">Archived</span></p>
+                                    <p class="text-sm text-slate-500">Updated by Inspector Smith on 15 Mar 2026 at 11:20</p>
+                                </div>
+                            </div>
+                            <button class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition text-sm"><i class="fas fa-eye mr-1"></i> View Only</button>
+                        </div>
+                        <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center"><i class="fas fa-file-import text-purple-600"></i></div>
+                                <div>
+                                    <p class="font-medium text-slate-900">v1.0 <span class="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-semibold ml-2">Original Import</span></p>
+                                    <p class="text-sm text-slate-500">Imported from SIRE on 01 Jan 2026 at 08:00</p>
+                                </div>
+                            </div>
+                            <button class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition text-sm"><i class="fas fa-eye mr-1"></i> View Only</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-marine-50 border border-marine-200 rounded-lg p-4">
+                    <p class="text-sm text-marine-800"><i class="fas fa-info-circle mr-1"></i> <strong>Versioning Rule:</strong> Once a template version is bound to an active inspection, it becomes immutable. All subsequent edits require creating a new version (e.g., v2.1 -> v2.2). Previous versions remain accessible in read-only mode for audit trail compliance.</p>
+                </div>
+            </div>
+        </div>
+        <div class="sticky bottom-0 bg-white border-t border-slate-200 px-6 py-4 flex justify-end gap-3 rounded-b-2xl">
+            <button onclick="closeModal('editModal')" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition">Cancel</button>
+            <button onclick="saveTemplate()" class="px-6 py-2 bg-marine-700 text-white rounded-lg hover:bg-marine-800 transition font-medium"><i class="fas fa-save mr-2"></i>Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- Clone Template Modal (Task 2.2) -->
+<div id="cloneModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay bg-black/50">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 animate-fade-in">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between rounded-t-2xl">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-marine-100 rounded-lg flex items-center justify-center"><i class="fas fa-copy text-marine-600"></i></div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Clone to New Version</h3>
+                    <p class="text-sm text-slate-500">Task 2.2: Template Schema & Versioning</p>
+                </div>
+            </div>
+            <button onclick="closeModal('cloneModal')" class="p-2 hover:bg-slate-100 rounded-lg transition"><i class="fas fa-times text-slate-400"></i></button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                <p class="text-sm text-slate-600">You are cloning <strong id="cloneSourceName">SIRE Vessel Inspection v2.1</strong> to create a new editable version. The current version will remain immutable.</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">New Version Number</label>
+                <div class="flex items-center gap-2">
+                    <input type="text" value="v2.2" id="newVersionInput" class="w-32 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500">
+                    <span class="text-sm text-slate-500">Auto-incremented from current v2.1</span>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Clone Options</label>
+                <div class="space-y-2">
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked class="w-4 h-4 text-marine-600 rounded"><span class="text-sm">Copy all questions and sections</span></label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked class="w-4 h-4 text-marine-600 rounded"><span class="text-sm">Copy question settings (C-Items, Favorable defaults)</span></label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked class="w-4 h-4 text-marine-600 rounded"><span class="text-sm">Copy reference images and attachments</span></label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="w-4 h-4 text-marine-600 rounded"><span class="text-sm">Reset all responses to default (unanswered)</span></label>
+                </div>
+            </div>
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p class="text-sm text-amber-800"><i class="fas fa-exclamation-triangle mr-1"></i> The new version will start as "Draft" and must be activated before use in inspections.</p>
+            </div>
+        </div>
+        <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl">
+            <button onclick="closeModal('cloneModal')" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition">Cancel</button>
+            <button onclick="confirmClone()" class="px-6 py-2 bg-marine-700 text-white rounded-lg hover:bg-marine-800 transition font-medium"><i class="fas fa-copy mr-2"></i>Create v2.2</button>
+        </div>
+    </div>
+</div>
+
+<!-- Copy Questions Modal (Task 2.3) -->
+<div id="copyQuestionsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay bg-black/50">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 animate-fade-in max-h-[80vh] overflow-auto">
+        <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-marine-100 rounded-lg flex items-center justify-center"><i class="fas fa-copy text-marine-600"></i></div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Copy Questions from Another Template</h3>
+                    <p class="text-sm text-slate-500">Task 2.3: Question Bank CRUD - Bulk Copy</p>
+                </div>
+            </div>
+            <button onclick="closeModal('copyQuestionsModal')" class="p-2 hover:bg-slate-100 rounded-lg transition"><i class="fas fa-times text-slate-400"></i></button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Select Source Template</label>
+                <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500" onchange="loadTemplateQuestions(this.value)">
+                    <option value="">-- Select a template --</option>
+                    <option value="takeover">Takeover Inspection (v3.0) - 203 questions</option>
+                    <option value="docking">Docking Inspection - Tankers (v1.0) - 89 questions</option>
+                    <option value="layup">SIRE Layup Inspection (v1.0) - 67 questions</option>
+                    <option value="internal">Internal Audit - General (v2.0) - 45 questions</option>
+                </select>
+            </div>
+            <div id="questionsList" class="hidden border border-slate-200 rounded-xl overflow-hidden">
+                <div class="bg-slate-50 px-4 py-2 border-b border-slate-200 flex items-center justify-between">
+                    <span class="text-sm font-medium text-slate-700">Available Questions</span>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="w-4 h-4 text-marine-600 rounded" onchange="toggleAllQuestions(this)"><span class="text-sm">Select All</span></label>
+                </div>
+                <div class="max-h-64 overflow-auto divide-y divide-slate-100">
+                    <label class="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer transition">
+                        <input type="checkbox" class="w-4 h-4 text-marine-600 rounded mt-0.5"><div><p class="text-sm font-medium text-slate-900">Is the vessel's name clearly marked on both sides?</p><p class="text-xs text-slate-500 mt-1">Section 1: General Information</p></div>
+                    </label>
+                    <label class="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer transition">
+                        <input type="checkbox" class="w-4 h-4 text-marine-600 rounded mt-0.5"><div><p class="text-sm font-medium text-slate-900">Are emergency steering procedures posted?</p><p class="text-xs text-slate-500 mt-1">Section 1: General Information - <span class="text-amber-600 font-medium">C-Item</span></p></div>
+                    </label>
+                    <label class="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer transition">
+                        <input type="checkbox" class="w-4 h-4 text-marine-600 rounded mt-0.5"><div><p class="text-sm font-medium text-slate-900">Is the load line certificate valid and onboard?</p><p class="text-xs text-slate-500 mt-1">Section 2: Certificates</p></div>
+                    </label>
+                    <label class="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer transition">
+                        <input type="checkbox" class="w-4 h-4 text-marine-600 rounded mt-0.5"><div><p class="text-sm font-medium text-slate-900">Are fire drills conducted weekly as per SMS?</p><p class="text-xs text-slate-500 mt-1">Section 3: Crew Management</p></div>
+                    </label>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Destination Section</label>
+                <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500">
+                    <option>Add to current section (Section 1: General Information)</option>
+                    <option>Create new section</option>
+                    <option>Section 2: Certificates & Documentation</option>
+                    <option>Section 3: Crew Management</option>
+                </select>
+            </div>
+        </div>
+        <div class="sticky bottom-0 bg-white border-t border-slate-200 px-6 py-4 flex justify-end gap-3 rounded-b-2xl">
+            <button onclick="closeModal('copyQuestionsModal')" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition">Cancel</button>
+            <button onclick="confirmCopyQuestions()" class="px-6 py-2 bg-marine-700 text-white rounded-lg hover:bg-marine-800 transition font-medium"><i class="fas fa-copy mr-2"></i>Copy Selected</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Question Modal (Task 2.3) -->
+<div id="addQuestionModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay bg-black/50">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 animate-fade-in max-h-[90vh] overflow-auto">
+        <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-marine-100 rounded-lg flex items-center justify-center"><i class="fas fa-plus text-marine-600"></i></div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Add New Question</h3>
+                    <p class="text-sm text-slate-500">Task 2.3: Question Bank CRUD</p>
+                </div>
+            </div>
+            <button onclick="closeModal('addQuestionModal')" class="p-2 hover:bg-slate-100 rounded-lg transition"><i class="fas fa-times text-slate-400"></i></button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Question Text</label>
+                <textarea rows="3" placeholder="Enter the inspection question..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Section</label>
+                    <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500">
+                        <option>Section 1: General Information</option>
+                        <option>Section 2: Certificates & Documentation</option>
+                        <option>Section 3: Crew Management</option>
+                        <option>+ Create New Section</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Question Type</label>
+                    <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500">
+                        <option>Visual Inspection</option>
+                        <option>Document Check</option>
+                        <option>Certificate Check</option>
+                        <option>Test/Measurement</option>
+                        <option>Interview</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Favorable Answer</label>
+                    <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500">
+                        <option>Yes</option>
+                        <option>No</option>
+                        <option>Valid</option>
+                        <option>Compliant</option>
+                        <option>N/A</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Response Format</label>
+                    <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500">
+                        <option>Tested/Inspected/Not Cited/NA</option>
+                        <option>Yes/No/NA</option>
+                        <option>1-5 Scale</option>
+                        <option>Free Text</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" class="w-4 h-4 text-marine-600 rounded">
+                    <span class="text-sm font-medium text-slate-700">Mark as Concentrated (C) Item</span>
+                </label>
+                <span class="text-xs text-slate-500">Highlights in amber during inspection</span>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Reference Images (Task 2.3)</label>
+                <div class="flex items-center gap-3">
+                    <button class="w-24 h-24 border-2 border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center text-slate-400 hover:border-marine-500 hover:text-marine-500 transition">
+                        <i class="fas fa-camera text-2xl mb-1"></i><span class="text-xs">Upload</span>
+                    </button>
+                    <p class="text-sm text-slate-500">Upload reference photos for inspector guidance (max 5MB each)</p>
+                </div>
+            </div>
+        </div>
+        <div class="sticky bottom-0 bg-white border-t border-slate-200 px-6 py-4 flex justify-end gap-3 rounded-b-2xl">
+            <button onclick="closeModal('addQuestionModal')" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition">Cancel</button>
+            <button onclick="saveQuestion()" class="px-6 py-2 bg-marine-700 text-white rounded-lg hover:bg-marine-800 transition font-medium"><i class="fas fa-plus mr-2"></i>Add Question</button>
+        </div>
+    </div>
+</div>
+
+<!-- Create Template Modal -->
+<div id="createModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay bg-black/50">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 animate-fade-in">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between rounded-t-2xl">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-marine-100 rounded-lg flex items-center justify-center"><i class="fas fa-plus text-marine-600"></i></div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Create New Template</h3>
+                    <p class="text-sm text-slate-500">Start with a blank template or import</p>
+                </div>
+            </div>
+            <button onclick="closeModal('createModal')" class="p-2 hover:bg-slate-100 rounded-lg transition"><i class="fas fa-times text-slate-400"></i></button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Template Name</label>
+                <input type="text" placeholder="e.g., Annual Vessel Inspection 2026" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Inspection Type</label>
+                    <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500">
+                        <option>Vessel Inspection (VI)</option>
+                        <option>Docking</option>
+                        <option>Takeover</option>
+                        <option>Layup</option>
+                        <option>Internal</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Initial Version</label>
+                    <input type="text" value="v1.0" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-marine-500">
+                </div>
+            </div>
+            <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                <p class="text-sm font-medium text-slate-700 mb-2">Start From:</p>
+                <div class="space-y-2">
+                    <label class="flex items-center gap-3 p-3 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-marine-500 transition">
+                        <input type="radio" name="startFrom" value="blank" checked class="w-4 h-4 text-marine-600">
+                        <div><p class="text-sm font-medium">Blank Template</p><p class="text-xs text-slate-500">Start from scratch with empty sections</p></div>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-marine-500 transition">
+                        <input type="radio" name="startFrom" value="existing" class="w-4 h-4 text-marine-600">
+                        <div><p class="text-sm font-medium">Copy from Existing Template</p><p class="text-xs text-slate-500">Clone questions and settings from another template</p></div>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-marine-500 transition">
+                        <input type="radio" name="startFrom" value="import" class="w-4 h-4 text-marine-600">
+                        <div><p class="text-sm font-medium">Import from Third-Party Report</p><p class="text-xs text-slate-500">Parse SIRE, CDI, or raw text report</p></div>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl">
+            <button onclick="closeModal('createModal')" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition">Cancel</button>
+            <button onclick="createTemplate()" class="px-6 py-2 bg-marine-700 text-white rounded-lg hover:bg-marine-800 transition font-medium"><i class="fas fa-plus mr-2"></i>Create Template</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="hidden fixed bottom-6 right-6 bg-slate-800 text-white px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3 animate-fade-in">
+    <i class="fas fa-check-circle text-green-400"></i>
+    <span id="toastMessage">Action completed successfully</span>
+</div>
+
+<script>
+// Modal Functions
+function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); document.body.style.overflow = ''; }
+
+function openImportModal() { openModal('importModal'); }
+function openCreateModal() { openModal('createModal'); }
+function openEditModal(templateName) { 
+    document.getElementById('editModalTitle').textContent = 'Edit Template: ' + templateName;
+    openModal('editModal'); 
+}
+function openCloneModal(templateName) {
+    document.getElementById('cloneSourceName').textContent = templateName + ' v2.1';
+    openModal('cloneModal');
+}
+function openCloneModalFromEdit() {
+    closeModal('editModal');
+    setTimeout(() => openCloneModal('SIRE Vessel Inspection'), 300);
+}
+function openCopyQuestionsModal() { openModal('copyQuestionsModal'); }
+function openAddQuestionModal() { openModal('addQuestionModal'); }
+
+// Tab Switching
+function switchTab(tabName) {
+    ['details', 'questions', 'settings', 'versions'].forEach(t => {
+        document.getElementById('content-' + t).classList.add('hidden');
+        document.getElementById('tab-' + t).classList.remove('tab-active');
+        document.getElementById('tab-' + t).classList.add('tab-inactive');
+    });
+    document.getElementById('content-' + tabName).classList.remove('hidden');
+    document.getElementById('tab-' + tabName).classList.remove('tab-inactive');
+    document.getElementById('tab-' + tabName).classList.add('tab-active');
+}
+
+// Dropdown Menu
+function toggleMenu(btn) {
+    const menu = btn.nextElementSibling;
+    menu.classList.toggle('hidden');
+    document.addEventListener('click', function close(e) {
+        if (!btn.contains(e.target) && !menu.contains(e.target)) {
+            menu.classList.add('hidden');
+            document.removeEventListener('click', close);
+        }
+    });
+}
+
+// Section Toggle
+function toggleSection(btn) {
+    const content = btn.closest('.section-header').nextElementSibling;
+    const icon = btn.querySelector('i');
+    if (content) {
+        content.classList.toggle('hidden');
+        icon.classList.toggle('fa-chevron-down');
+        icon.classList.toggle('fa-chevron-right');
+    }
+}
+
+// Concentrated Item Toggle
+function toggleConcentrated(checkbox) {
+    const row = checkbox.closest('.question-row');
+    const label = checkbox.closest('label').querySelector('span:last-child');
+    if (checkbox.checked) {
+        row.classList.add('concentrated-item');
+        label.textContent = 'C-Item';
+        label.classList.add('font-semibold', 'text-marine-700');
+        label.classList.remove('text-slate-500');
+    } else {
+        row.classList.remove('concentrated-item');
+        label.textContent = 'C-Item';
+        label.classList.remove('font-semibold', 'text-marine-700');
+        label.classList.add('text-slate-500');
+    }
+}
+
+// Settings Toggle
+function toggleSetting(checkbox, setting) {
+    showToast(setting + ' setting ' + (checkbox.checked ? 'enabled' : 'disabled'));
+}
+
+// File Import
+function handleFileSelect(input) {
+    if (input.files && input.files[0]) {
+        document.getElementById('filePreview').classList.remove('hidden');
+    }
+}
+function clearFile() {
+    document.getElementById('fileInput').value = '';
+    document.getElementById('filePreview').classList.add('hidden');
+}
+
+// Parse Report
+function parseReport() {
+    showToast('Report parsed successfully! 156 questions imported.');
+    closeModal('importModal');
+}
+
+// Save Draft
+function saveDraft() {
+    showToast('Draft saved successfully');
+}
+
+// Save Template
+function saveTemplate() {
+    showToast('Template saved successfully');
+    closeModal('editModal');
+}
+
+// Clone
+function confirmClone() {
+    const newVersion = document.getElementById('newVersionInput').value;
+    showToast('Template cloned to ' + newVersion + ' successfully!');
+    closeModal('cloneModal');
+}
+
+// Copy Questions
+function loadTemplateQuestions(templateId) {
+    if (templateId) {
+        document.getElementById('questionsList').classList.remove('hidden');
+    }
+}
+function toggleAllQuestions(checkbox) {
+    document.querySelectorAll('#questionsList input[type="checkbox"]').forEach(cb => cb.checked = checkbox.checked);
+}
+function confirmCopyQuestions() {
+    showToast('Questions copied successfully!');
+    closeModal('copyQuestionsModal');
+}
+
+// Add Question
+function saveQuestion() {
+    showToast('Question added successfully!');
+    closeModal('addQuestionModal');
+}
+
+// Create Template
+function createTemplate() {
+    showToast('New template created successfully!');
+    closeModal('createModal');
+}
+
+// Toast
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMessage').textContent = message;
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
+// Close modal on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        ['importModal', 'editModal', 'cloneModal', 'copyQuestionsModal', 'addQuestionModal', 'createModal'].forEach(id => {
+            document.getElementById(id).classList.add('hidden');
+        });
+        document.body.style.overflow = '';
+    }
+});
+</script>
+
+</body>
+</html>
+
+
